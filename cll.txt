@@ -1,0 +1,193 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<malloc.h>
+#include<math.h>
+
+struct node 
+{
+ int e;
+ float c;
+ struct node *next;
+}cll;
+
+struct node *getnode()
+{
+ node *p;
+ p=(void*)malloc(sizeof(cll));
+ p->next=p;
+ return p;
+}
+
+struct node *insert(struct node *head,float c,int e)
+{
+ struct node *temp,*p;
+ p=getnode();
+ p->c=c;
+ p->e=e;
+ if(head==NULL)
+  head=p;
+ else if(e<head->e)
+ {
+  p->next=head->next;
+  head->next=p;
+  head=p;
+ }
+ else if(e==head->e)
+  head->c+=c;
+ else
+ {
+  temp=head;
+  while(e<=temp->next->e && temp->next!=head)
+   temp=temp->next;
+  if(temp->e==e)
+   temp->c+=c; 
+  else
+  {
+   p->next=temp->next;
+   temp->next=p; 
+  }
+ }
+ return head; 
+}
+
+
+struct node *create()
+{
+ struct node *head=NULL,*p;
+ int i,n,e;
+ float c;
+ printf("\nEnter no of terms: ");
+ scanf("%d",&n);
+ for(i=0;i<n;i++)
+ {
+ 
+  printf("\nEnter coef & exp of term[%d]: ",i+1);
+  scanf("%f%d",&c,&e);
+  head=insert(head,c,e);
+ }
+ return head;
+}
+
+void display(struct node *head)
+{ 
+ struct node *temp;
+ if(head!=NULL)
+ {
+  temp=head->next;
+  do
+  {
+   if(temp->e!=0)
+    printf("[%.1fX^%d] ",temp->c,temp->e);
+   else
+    printf("[%.1]",temp->c);    
+   temp=temp->next; 
+  }while(temp!=head->next);
+  
+ }
+ else
+  printf("\nPolynomial is Empty\n");
+}
+
+struct node *add(struct node *p1,node *p2)
+{
+struct node *p3=NULL;
+ node *temp;
+ temp=p1->next;
+ do
+ {
+  p3=insert(p3,temp->c,temp->e);
+  temp=temp->next;
+ }while(temp!=p1->next);
+ 
+ temp=p2->next;
+ do
+ {
+  p3=insert(p3,temp->c,temp->e);
+  temp=temp->next;
+ }while(temp!=p2->next);
+ return p3;
+}
+
+struct node *mul(struct node *p1,node *p2)
+{
+ struct node *p3=NULL;
+ struct node *temp1=p1->next,*temp2=p2->next;
+ do
+ {
+  do
+  {
+   p3=insert(p3,temp1->c*temp2->c,temp1->e+temp2->e);
+   temp2=temp2->next;
+  }while(temp2!=p2->next);
+
+   temp1=temp1->next;
+ }while(temp1!=p1->next);
+ return p3;
+}
+
+float eval(struct node *p1)
+{
+ int x;
+ float val=0.0;
+ struct node *temp=p1->next;
+ printf("\nEnter val of x: ");
+ scanf("%d",&x);
+ do
+ {
+  val=val+(temp->c * pow(x,temp->e) );
+  temp=temp->next;
+ }while(temp!=p1->next);
+ 
+ return val;
+}
+
+int main()
+{
+ int ch;
+ float val;
+struct node *p1=NULL,*p2=NULL,*p3;
+ while(1)
+ {
+  printf("\nPoly P1: ");
+  display(p1);
+  printf("\nPoly P2: ");
+  display(p2);
+  printf("\n\n*******MENU************");
+  printf("\n1.Create\n2.add\n3.mul");
+  printf("\n4.eval\n5.Exit\nEnter ur choice: ");
+  scanf("%d",&ch);
+  switch(ch)
+  {
+   case 1:
+    printf("\nEnter poly 1: ");
+    p1=create();
+    printf("\n\nEnter poly 2: ");
+    p2=create();
+    break;
+   case 2:
+    
+    p3=add(p1,p2);
+    printf("\n\nAfter ADD: ");
+    display(p3);
+ 
+    break;
+   case 3:
+    p3=mul(p1,p2);
+    printf("\n\nAfter MULTIPLICATION: ");
+    display(p3);
+    
+    break;
+   case 4:
+    val=eval(p1);
+    printf("\nExpression Evaluation of p1: %f",val);
+    val=eval(p1);
+    printf("\nExpression Evaluation of p2: %f",val);
+    
+   break;
+   case 5:
+   break;
+  }
+  
+ }
+ return 0;
+}
